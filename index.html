@@ -3,10 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>beantime — a pour over timer</title>
+<title>Pour — Pourover Timer</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="icon" type="image/png" href="beantime.png">
 <style>
   :root {
     --cream: #F5F0E8;
@@ -805,6 +804,7 @@
         <div class="step-label" id="step-label">Step 1 of 5</div>
         <div class="step-name" id="step-name">Bloom</div>
         <div class="pour-amount" id="pour-amount">60 <span>g</span></div>
+        <div style="font-size:13px; color:rgba(255,255,255,0.4); margin-top:0.25rem;" id="pour-this-step">+60g this pour</div>
         <div class="timer-clock" id="timer-clock">0:45</div>
         <div class="timer-status" id="timer-status">pouring</div>
       </div>
@@ -1061,6 +1061,11 @@ function computeSteps() {
   const sum = computed.reduce((a, s) => a + s.grams, 0);
   const diff = total - sum;
   if (diff !== 0) computed[computed.length - 1].grams += diff;
+  let running = 0;
+  computed = computed.map(s => {
+    running += s.grams;
+    return { ...s, cumulativeGrams: running };
+  });
   state.computedSteps = computed;
   renderRatioInfo();
   renderPreviewSteps();
@@ -1080,7 +1085,7 @@ function renderPreviewSteps() {
     <div class="step-row">
       <div class="step-row-num">${i + 1}</div>
       <div class="step-row-name">${s.name}</div>
-      <div class="step-row-grams">${s.grams}g</div>
+      <div class="step-row-grams">+${s.grams}g → <strong>${s.cumulativeGrams}g</strong></div>
       <div class="step-row-time">${s.pourSeconds}s pour / ${s.waitSeconds}s wait</div>
     </div>
   `).join('');
@@ -1129,7 +1134,7 @@ function renderActiveStepsList() {
     return `<div class="${cls}" id="steprow-${i}">
       ${icon}
       <div class="step-row-name">${s.name}</div>
-      <div class="step-row-grams">${s.grams}g</div>
+      <div class="step-row-grams">${s.cumulativeGrams}g</div>
       <div class="step-row-time">${s.pourSeconds}s / ${s.waitSeconds}s</div>
     </div>`;
   }).join('');
@@ -1147,7 +1152,8 @@ function updateTimerDisplay() {
   document.getElementById('step-label').textContent =
     `Step ${state.currentStep + 1} of ${total}`;
   document.getElementById('step-name').textContent = step.name;
-  document.getElementById('pour-amount').innerHTML = `${step.grams} <span>g</span>`;
+  document.getElementById('pour-amount').innerHTML = `${step.cumulativeGrams} <span>g</span>`;
+  document.getElementById('pour-this-step').textContent = `+${step.grams}g this pour`;
   document.getElementById('timer-clock').textContent =
     `${mins}:${secs.toString().padStart(2, '0')}`;
   document.getElementById('timer-status').textContent = isPour ? 'pouring' : 'waiting / draw-down';
