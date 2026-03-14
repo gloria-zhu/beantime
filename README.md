@@ -18,7 +18,7 @@ A beautiful, no-nonsense pourover timer for coffee nerds. Built as a single HTML
 
 ## 🚀 Using It
 
-Just visit **[brew.yourdomain.com](https://brew.yourdomain.com)** in any browser.
+Just visit **[brew.yourdomain.com](https://beantime.gloriamingzhu.com)** in any browser.
 
 On iPhone: tap the share icon → **Add to Home Screen** for a native app-like experience.
 
@@ -45,4 +45,4 @@ Data is stored in `localStorage` — meaning your recipes and history persist be
 
 ## ☕ Made by
 
-[Your Name](https://yourportfolio.com) — coffee obsessive, [whatever else you want to say here].
+[Gloria](https://www.gloriamingzhu.com/) — coffee obsessive designer.
