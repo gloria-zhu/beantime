@@ -695,12 +695,61 @@ textarea {
 }
 
 /* ─── HISTORY VIEW ─── */
+/* ─── HISTORY VIEW ─── */
+
+.history-swipe-wrap {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 0.75rem;
+  max-height: 1000px;
+}
+
+.history-delete-reveal {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 80px;
+  background: var(--danger);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  letter-spacing: 0.02em;
+}
+
+.history-delete-reveal:hover {
+  background: #7a2f2f;
+}
+
 .history-item {
   background: var(--warm-white);
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 1.25rem 1.5rem;
-  margin-bottom: 0.75rem;
+  position: relative;
+}
+
+.history-delete-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+  color: var(--ink-light);
+  padding: 2px 4px;
+  border-radius: 4px;
+  transition: color 0.15s, background 0.15s;
+  flex-shrink: 0;
+}
+
+.history-delete-btn:hover {
+  color: var(--danger);
+  background: var(--danger-bg);
 }
 
 .history-header {
