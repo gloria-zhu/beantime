@@ -1,0 +1,846 @@
+/* ─────────────────────────────────────────
+   BEANTIME — POUROVER TIMER
+   styles.css
+
+   To change the color theme, update the
+   CSS variables in :root below. Every color
+   in the app references these variables.
+───────────────────────────────────────── */
+
+/* ─── THEME TOKENS ─── */
+:root {
+  /* Backgrounds */
+  --cream:        #F5F0E8;
+  --cream-dark:   #EAE3D5;
+  --warm-white:   #FDFAF5;
+
+  /* Text */
+  --ink:          #1C1917;
+  --ink-mid:      #44403C;
+  --ink-light:    #78716C;
+
+  /* Brand / accent */
+  --copper:       #A0522D;
+  --copper-light: #C47840;
+  --copper-pale:  #F0E0D0;
+
+  /* Borders */
+  --border:       rgba(28, 25, 23, 0.12);
+  --border-strong:rgba(28, 25, 23, 0.22);
+
+  /* Semantic */
+  --success:      #3D6B47;
+  --success-bg:   #E8F2EA;
+  --danger:       #8B3A3A;
+  --danger-bg:    #F5E8E8;
+  --active-blue:  #2D5A8B;
+  --active-blue-bg:#E5EFF8;
+
+  /* Warning (validation) */
+  --warning-bg:   #FFF8E7;
+  --warning-border:rgba(160, 115, 0, 0.2);
+  --warning-text: #7A5700;
+}
+
+/* ─── RESET ─── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* ─── BASE ─── */
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--cream);
+  color: var(--ink);
+  min-height: 100vh;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+/* ─── LAYOUT ─── */
+.app {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 0 1.25rem 4rem;
+}
+
+header {
+  padding: 2.5rem 0 1.5rem;
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  justify-content: space-between;
+}
+
+/* ─── TYPOGRAPHY ─── */
+.logo {
+  font-family: 'DM Serif Display', serif;
+  font-size: 2rem;
+  color: var(--ink);
+  letter-spacing: -0.02em;
+}
+
+.logo span {
+  color: var(--copper);
+  font-style: italic;
+}
+
+.header-subtitle {
+  font-size: 12px;
+  color: var(--ink-light);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* ─── NAVIGATION ─── */
+nav {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 2rem;
+}
+
+.nav-btn {
+  padding: 0.7rem 1.25rem;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink-light);
+  cursor: pointer;
+  letter-spacing: 0.03em;
+  transition: color 0.15s, border-color 0.15s;
+  margin-bottom: -1px;
+}
+
+.nav-btn.active {
+  color: var(--copper);
+  border-bottom-color: var(--copper);
+}
+
+.nav-btn:hover:not(.active) {
+  color: var(--ink);
+}
+
+/* ─── VIEWS ─── */
+.view { display: none; }
+.view.active { display: block; }
+
+/* ─── CARDS ─── */
+.card {
+  background: var(--warm-white);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.card-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  color: var(--ink);
+}
+
+/* ─── FORM ELEMENTS ─── */
+label {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ink-light);
+  margin-bottom: 0.35rem;
+}
+
+input[type="text"],
+input[type="number"],
+textarea,
+select {
+  width: 100%;
+  padding: 0.6rem 0.85rem;
+  background: var(--cream);
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  color: var(--ink);
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--copper);
+}
+
+textarea {
+  resize: vertical;
+  min-height: 70px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+/* ─── BUTTONS ─── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0.65rem 1.25rem;
+  border-radius: 8px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+  border: 1px solid;
+}
+
+.btn-primary {
+  background: var(--copper);
+  color: var(--warm-white);
+  border-color: var(--copper);
+}
+
+.btn-primary:hover {
+  background: var(--copper-light);
+  border-color: var(--copper-light);
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--ink-mid);
+  border-color: var(--border-strong);
+}
+
+.btn-outline:hover {
+  background: var(--cream-dark);
+}
+
+.btn-danger {
+  background: transparent;
+  color: var(--danger);
+  border-color: rgba(139, 58, 58, 0.3);
+}
+
+.btn-danger:hover {
+  background: var(--danger-bg);
+}
+
+.btn-sm {
+  padding: 0.4rem 0.75rem;
+  font-size: 12px;
+  border-radius: 6px;
+}
+
+.btn-full {
+  width: 100%;
+}
+
+/* ─── BREW VIEW: SETUP ─── */
+.setup-section {
+  margin-bottom: 1.5rem;
+}
+
+.recipe-selector {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-end;
+  margin-bottom: 1rem;
+}
+
+.recipe-selector select {
+  flex: 1;
+}
+
+.brew-inputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.big-input-wrap {
+  background: var(--cream-dark);
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  padding: 0.85rem 1rem;
+}
+
+.big-input-wrap label {
+  margin-bottom: 0.25rem;
+}
+
+.big-input-wrap input {
+  background: transparent;
+  border: none;
+  font-family: 'DM Mono', monospace;
+  font-size: 1.6rem;
+  font-weight: 500;
+  padding: 0;
+  width: 100%;
+  color: var(--ink);
+}
+
+.big-input-wrap input:focus {
+  border: none;
+  outline: none;
+}
+
+.big-input-unit {
+  font-size: 11px;
+  color: var(--ink-light);
+  margin-top: 0.1rem;
+}
+
+/* ─── BREW VIEW: TIMER ─── */
+.timer-display {
+  background: var(--ink);
+  border-radius: 16px;
+  padding: 2rem 1.5rem;
+  text-align: center;
+  margin-bottom: 1rem;
+  color: var(--warm-white);
+  position: relative;
+  overflow: hidden;
+}
+
+.timer-display::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--copper);
+  transform-origin: left;
+  transform: scaleX(0);
+  transition: transform 1s linear;
+}
+
+.timer-display.pouring::before {
+  transform: scaleX(var(--progress, 0));
+}
+
+.step-label {
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 0.5rem;
+}
+
+.step-name {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.4rem;
+  color: var(--copper-light);
+  margin-bottom: 1.5rem;
+}
+
+.pour-amount {
+  font-family: 'DM Mono', monospace;
+  font-size: 4rem;
+  font-weight: 300;
+  line-height: 1;
+  color: var(--warm-white);
+}
+
+.pour-amount span {
+  font-size: 1.2rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.pour-this-step {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.4);
+  margin-top: 0.25rem;
+}
+
+.timer-clock {
+  font-family: 'DM Mono', monospace;
+  font-size: 1.5rem;
+  margin-top: 1rem;
+  color: var(--copper-light);
+}
+
+.timer-status {
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-top: 0.5rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.timer-done {
+  background: var(--success-bg);
+  border: 1px solid rgba(61, 107, 71, 0.2);
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: none;
+}
+
+.timer-done h2 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.5rem;
+  color: var(--success);
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+.timer-done p {
+  color: var(--ink-mid);
+  font-size: 14px;
+  text-align: center;
+}
+
+/* ─── BREW VIEW: STEPS ─── */
+.steps-progress {
+  margin-bottom: 1rem;
+}
+
+.steps-track {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 0.75rem;
+}
+
+.step-pip {
+  flex: 1;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--border);
+  transition: background 0.3s;
+}
+
+.step-pip.done  { background: var(--copper); }
+.step-pip.active { background: var(--copper-light); }
+
+.steps-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.step-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0.7rem 0.9rem;
+  background: var(--warm-white);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 13px;
+  transition: all 0.2s;
+}
+
+.step-row.step-done {
+  opacity: 0.5;
+  background: var(--cream-dark);
+}
+
+.step-row.step-active {
+  border-color: var(--copper);
+  background: var(--copper-pale);
+}
+
+.step-row.step-active .step-row-num {
+  color: var(--copper);
+}
+
+.step-row-num {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--ink-light);
+  min-width: 18px;
+}
+
+.step-row-name {
+  flex: 1;
+  font-weight: 500;
+}
+
+.step-row-grams {
+  font-family: 'DM Mono', monospace;
+  font-size: 13px;
+  color: var(--ink-mid);
+}
+
+.step-row-time {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  color: var(--ink-light);
+  min-width: 60px;
+  text-align: right;
+}
+
+.checkmark {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--copper);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.checkmark::after {
+  content: '';
+  width: 8px;
+  height: 4px;
+  border-left: 1.5px solid white;
+  border-bottom: 1.5px solid white;
+  transform: rotate(-45deg) translate(1px, -1px);
+}
+
+/* ─── BREW VIEW: CONTROLS ─── */
+.timer-controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.timer-controls.three {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+/* ─── BREW VIEW: SESSION LOG ─── */
+.session-note-section {
+  margin-top: 1rem;
+}
+
+.tag-input-wrap {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  background: var(--cream);
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  padding: 0.5rem;
+  min-height: 42px;
+  cursor: text;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--copper-pale);
+  color: var(--copper);
+  border-radius: 20px;
+  padding: 2px 10px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.tag-remove {
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  color: var(--copper);
+  opacity: 0.6;
+}
+
+.tag-remove:hover {
+  opacity: 1;
+}
+
+.tag-input {
+  border: none;
+  background: transparent;
+  font-size: 13px;
+  min-width: 80px;
+  flex: 1;
+  color: var(--ink);
+  padding: 0;
+}
+
+.tag-input:focus {
+  outline: none;
+  border: none;
+}
+
+/* ─── RECIPES VIEW ─── */
+.recipe-card {
+  background: var(--warm-white);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 0.75rem;
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.recipe-card:hover {
+  border-color: var(--copper-light);
+  box-shadow: 0 2px 8px rgba(160, 82, 45, 0.08);
+}
+
+.recipe-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.recipe-card-name {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.05rem;
+}
+
+.recipe-badge {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-weight: 500;
+}
+
+.badge-builtin {
+  background: var(--copper-pale);
+  color: var(--copper);
+}
+
+.badge-custom {
+  background: var(--active-blue-bg);
+  color: var(--active-blue);
+}
+
+.recipe-card-meta {
+  font-size: 12px;
+  color: var(--ink-light);
+}
+
+.recipe-steps-preview {
+  display: flex;
+  gap: 4px;
+  margin-top: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.step-chip {
+  background: var(--cream-dark);
+  border-radius: 6px;
+  padding: 3px 8px;
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--ink-mid);
+}
+
+/* ─── RECIPE EDITOR ─── */
+.recipe-editor {
+  background: var(--warm-white);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.editor-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.2rem;
+  margin-bottom: 1.25rem;
+}
+
+.pour-steps-editor {
+  margin-bottom: 1rem;
+}
+
+.pour-step-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr auto;
+  gap: 0.5rem;
+  align-items: end;
+  margin-bottom: 0.5rem;
+}
+
+.pour-step-row input {
+  font-size: 13px;
+  padding: 0.5rem 0.65rem;
+}
+
+.pour-step-row label {
+  font-size: 11px;
+}
+
+.remove-step {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--ink-light);
+  font-size: 18px;
+  line-height: 1;
+  padding: 6px;
+  border-radius: 6px;
+  transition: color 0.15s;
+  margin-bottom: 1px;
+}
+
+.remove-step:hover {
+  color: var(--danger);
+}
+
+/* ─── HISTORY VIEW ─── */
+.history-item {
+  background: var(--warm-white);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.history-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.history-recipe-name {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1rem;
+}
+
+.history-date {
+  font-size: 11px;
+  color: var(--ink-light);
+  font-family: 'DM Mono', monospace;
+}
+
+.history-meta {
+  font-size: 13px;
+  color: var(--ink-mid);
+  margin-bottom: 0.5rem;
+}
+
+.history-bean {
+  font-size: 13px;
+  color: var(--ink-mid);
+  font-weight: 500;
+  margin-bottom: 0.4rem;
+}
+
+.history-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 0.5rem;
+}
+
+.history-tag {
+  background: var(--cream-dark);
+  border-radius: 20px;
+  padding: 2px 8px;
+  font-size: 11px;
+  color: var(--ink-mid);
+}
+
+.history-notes {
+  font-size: 13px;
+  color: var(--ink-light);
+  border-left: 2px solid var(--border);
+  padding-left: 0.75rem;
+  font-style: italic;
+  margin-top: 0.5rem;
+}
+
+/* ─── EMPTY STATE ─── */
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--ink-light);
+}
+
+.empty-state-icon {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  opacity: 0.4;
+}
+
+.empty-state p {
+  font-size: 14px;
+}
+
+/* ─── SHARED UTILITIES ─── */
+.divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 1.25rem 0;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.section-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.1rem;
+}
+
+.ratio-info {
+  background: var(--cream-dark);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  font-size: 12px;
+  color: var(--ink-mid);
+  margin-bottom: 1rem;
+  font-family: 'DM Mono', monospace;
+}
+
+.validation-warning {
+  background: var(--warning-bg);
+  border: 1px solid var(--warning-border);
+  border-radius: 8px;
+  padding: 0.6rem 1rem;
+  font-size: 12px;
+  color: var(--warning-text);
+  margin-top: 0.5rem;
+  display: none;
+}
+
+/* ─── TOAST ─── */
+.toast {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: var(--ink);
+  color: var(--warm-white);
+  padding: 0.7rem 1.25rem;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+  z-index: 100;
+  transition: transform 0.3s ease;
+  pointer-events: none;
+}
+
+.toast.show {
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 480px) {
+  .form-row             { grid-template-columns: 1fr; }
+  .brew-inputs          { grid-template-columns: 1fr 1fr; }
+  .pour-amount          { font-size: 3rem; }
+  .pour-step-row        { grid-template-columns: 1fr 1fr; }
+  .pour-step-row .col-name { grid-column: 1 / -1; }
+}

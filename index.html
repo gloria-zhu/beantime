@@ -1,763 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>beantime — a pour over timer</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="icon" type="image/png" href="beantime.png">
-<style>
-  :root {
-    --cream: #F5F0E8;
-    --cream-dark: #EAE3D5;
-    --ink: #1C1917;
-    --ink-mid: #44403C;
-    --ink-light: #78716C;
-    --copper: #A0522D;
-    --copper-light: #C47840;
-    --copper-pale: #F0E0D0;
-    --warm-white: #FDFAF5;
-    --border: rgba(28,25,23,0.12);
-    --border-strong: rgba(28,25,23,0.22);
-    --success: #3D6B47;
-    --success-bg: #E8F2EA;
-    --danger: #8B3A3A;
-    --danger-bg: #F5E8E8;
-    --active-blue: #2D5A8B;
-    --active-blue-bg: #E5EFF8;
-  }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--cream);
-    color: var(--ink);
-    min-height: 100vh;
-    font-size: 15px;
-    line-height: 1.6;
-  }
-
-  .app {
-    max-width: 680px;
-    margin: 0 auto;
-    padding: 0 1.25rem 4rem;
-  }
-
-  header {
-    padding: 2.5rem 0 1.5rem;
-    display: flex;
-    align-items: baseline;
-    gap: 1rem;
-    justify-content: space-between;
-  }
-
-  .logo {
-    font-family: 'DM Serif Display', serif;
-    font-size: 2rem;
-    color: var(--ink);
-    letter-spacing: -0.02em;
-  }
-
-  .logo span {
-    color: var(--copper);
-    font-style: italic;
-  }
-
-  .header-subtitle {
-    font-size: 12px;
-    color: var(--ink-light);
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-  }
-
-  nav {
-    display: flex;
-    gap: 0;
-    border-bottom: 1px solid var(--border);
-    margin-bottom: 2rem;
-  }
-
-  .nav-btn {
-    padding: 0.7rem 1.25rem;
-    background: none;
-    border: none;
-    border-bottom: 2px solid transparent;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--ink-light);
-    cursor: pointer;
-    letter-spacing: 0.03em;
-    transition: color 0.15s, border-color 0.15s;
-    margin-bottom: -1px;
-  }
-
-  .nav-btn.active {
-    color: var(--copper);
-    border-bottom-color: var(--copper);
-  }
-
-  .nav-btn:hover:not(.active) { color: var(--ink); }
-
-  .view { display: none; }
-  .view.active { display: block; }
-
-  /* Cards */
-  .card {
-    background: var(--warm-white);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 1.5rem;
-    margin-bottom: 1rem;
-  }
-
-  .card-title {
-    font-family: 'DM Serif Display', serif;
-    font-size: 1.1rem;
-    margin-bottom: 1rem;
-    color: var(--ink);
-  }
-
-  /* Form elements */
-  label {
-    display: block;
-    font-size: 12px;
-    font-weight: 500;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    color: var(--ink-light);
-    margin-bottom: 0.35rem;
-  }
-
-  input[type="text"],
-  input[type="number"],
-  textarea,
-  select {
-    width: 100%;
-    padding: 0.6rem 0.85rem;
-    background: var(--cream);
-    border: 1px solid var(--border-strong);
-    border-radius: 8px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-    color: var(--ink);
-    outline: none;
-    transition: border-color 0.15s;
-  }
-
-  input:focus, textarea:focus, select:focus {
-    border-color: var(--copper);
-  }
-
-  textarea { resize: vertical; min-height: 70px; }
-
-  .form-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
-    margin-bottom: 1rem;
-  }
-
-  .form-group { margin-bottom: 1rem; }
-
-  /* Buttons */
-  .btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    padding: 0.65rem 1.25rem;
-    border-radius: 8px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.15s;
-    border: 1px solid;
-  }
-
-  .btn-primary {
-    background: var(--copper);
-    color: var(--warm-white);
-    border-color: var(--copper);
-  }
-
-  .btn-primary:hover { background: var(--copper-light); border-color: var(--copper-light); }
-
-  .btn-outline {
-    background: transparent;
-    color: var(--ink-mid);
-    border-color: var(--border-strong);
-  }
-
-  .btn-outline:hover { background: var(--cream-dark); }
-
-  .btn-danger {
-    background: transparent;
-    color: var(--danger);
-    border-color: rgba(139,58,58,0.3);
-  }
-
-  .btn-danger:hover { background: var(--danger-bg); }
-
-  .btn-sm { padding: 0.4rem 0.75rem; font-size: 12px; border-radius: 6px; }
-
-  .btn-full { width: 100%; }
-
-  /* ─── TIMER VIEW ─── */
-  .setup-section { margin-bottom: 1.5rem; }
-
-  .recipe-selector {
-    display: flex;
-    gap: 0.75rem;
-    align-items: flex-end;
-    margin-bottom: 1rem;
-  }
-
-  .recipe-selector select { flex: 1; }
-
-  .brew-inputs {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
-    margin-bottom: 1.25rem;
-  }
-
-  .big-input-wrap {
-    background: var(--cream-dark);
-    border: 1px solid var(--border-strong);
-    border-radius: 10px;
-    padding: 0.85rem 1rem;
-  }
-
-  .big-input-wrap label { margin-bottom: 0.25rem; }
-
-  .big-input-wrap input {
-    background: transparent;
-    border: none;
-    font-family: 'DM Mono', monospace;
-    font-size: 1.6rem;
-    font-weight: 500;
-    padding: 0;
-    width: 100%;
-    color: var(--ink);
-  }
-
-  .big-input-wrap input:focus { border: none; outline: none; }
-
-  .big-input-unit {
-    font-size: 11px;
-    color: var(--ink-light);
-    margin-top: 0.1rem;
-  }
-
-  /* Timer display */
-  .timer-display {
-    background: var(--ink);
-    border-radius: 16px;
-    padding: 2rem 1.5rem;
-    text-align: center;
-    margin-bottom: 1rem;
-    color: var(--warm-white);
-    position: relative;
-    overflow: hidden;
-  }
-
-  .timer-display::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 3px;
-    background: var(--copper);
-    transform-origin: left;
-    transform: scaleX(0);
-    transition: transform 1s linear;
-  }
-
-  .timer-display.pouring::before {
-    transform: scaleX(var(--progress, 0));
-  }
-
-  .step-label {
-    font-size: 11px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: rgba(255,255,255,0.5);
-    margin-bottom: 0.5rem;
-  }
-
-  .step-name {
-    font-family: 'DM Serif Display', serif;
-    font-size: 1.4rem;
-    color: var(--copper-light);
-    margin-bottom: 1.5rem;
-  }
-
-  .pour-amount {
-    font-family: 'DM Mono', monospace;
-    font-size: 4rem;
-    font-weight: 300;
-    line-height: 1;
-    color: var(--warm-white);
-  }
-
-  .pour-amount span {
-    font-size: 1.2rem;
-    color: rgba(255,255,255,0.5);
-  }
-
-  .timer-clock {
-    font-family: 'DM Mono', monospace;
-    font-size: 1.5rem;
-    margin-top: 1rem;
-    color: var(--copper-light);
-  }
-
-  .timer-status {
-    font-size: 12px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    margin-top: 0.5rem;
-    color: rgba(255,255,255,0.4);
-  }
-
-  .timer-done {
-    background: var(--success-bg);
-    border: 1px solid rgba(61,107,71,0.2);
-    border-radius: 12px;
-    padding: 1.5rem;
-    text-align: center;
-    display: none;
-  }
-
-  .timer-done h2 {
-    font-family: 'DM Serif Display', serif;
-    font-size: 1.5rem;
-    color: var(--success);
-    margin-bottom: 0.5rem;
-  }
-
-  .timer-done p { color: var(--ink-mid); font-size: 14px; }
-
-  /* Steps progress */
-  .steps-progress {
-    margin-bottom: 1rem;
-  }
-
-  .steps-track {
-    display: flex;
-    gap: 4px;
-    margin-bottom: 0.75rem;
-  }
-
-  .step-pip {
-    flex: 1;
-    height: 4px;
-    border-radius: 2px;
-    background: var(--border);
-    transition: background 0.3s;
-  }
-
-  .step-pip.done { background: var(--copper); }
-  .step-pip.active { background: var(--copper-light); }
-
-  .steps-list {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-
-  .step-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 0.7rem 0.9rem;
-    background: var(--warm-white);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    font-size: 13px;
-    transition: all 0.2s;
-  }
-
-  .step-row.step-done {
-    opacity: 0.5;
-    background: var(--cream-dark);
-  }
-
-  .step-row.step-active {
-    border-color: var(--copper);
-    background: var(--copper-pale);
-  }
-
-  .step-row.step-active .step-row-num { color: var(--copper); }
-
-  .step-row-num {
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    color: var(--ink-light);
-    min-width: 18px;
-  }
-
-  .step-row-name { flex: 1; font-weight: 500; }
-
-  .step-row-grams {
-    font-family: 'DM Mono', monospace;
-    font-size: 13px;
-    color: var(--ink-mid);
-  }
-
-  .step-row-time {
-    font-family: 'DM Mono', monospace;
-    font-size: 12px;
-    color: var(--ink-light);
-    min-width: 60px;
-    text-align: right;
-  }
-
-  .checkmark {
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-    background: var(--copper);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-  }
-
-  .checkmark::after {
-    content: '';
-    width: 8px;
-    height: 4px;
-    border-left: 1.5px solid white;
-    border-bottom: 1.5px solid white;
-    transform: rotate(-45deg) translate(1px, -1px);
-  }
-
-  /* Controls */
-  .timer-controls {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.75rem;
-    margin-bottom: 1rem;
-  }
-
-  .timer-controls.three { grid-template-columns: 1fr 1fr 1fr; }
-
-  /* Session notes */
-  .session-note-section {
-    margin-top: 1rem;
-  }
-
-  .tag-input-wrap {
-    display: flex;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-    background: var(--cream);
-    border: 1px solid var(--border-strong);
-    border-radius: 8px;
-    padding: 0.5rem;
-    min-height: 42px;
-    cursor: text;
-  }
-
-  .tag {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    background: var(--copper-pale);
-    color: var(--copper);
-    border-radius: 20px;
-    padding: 2px 10px;
-    font-size: 12px;
-    font-weight: 500;
-  }
-
-  .tag-remove {
-    cursor: pointer;
-    font-size: 14px;
-    line-height: 1;
-    color: var(--copper);
-    opacity: 0.6;
-  }
-
-  .tag-remove:hover { opacity: 1; }
-
-  .tag-input {
-    border: none;
-    background: transparent;
-    font-size: 13px;
-    min-width: 80px;
-    flex: 1;
-    color: var(--ink);
-    padding: 0;
-  }
-
-  .tag-input:focus { outline: none; border: none; }
-
-  /* ─── RECIPES VIEW ─── */
-  .recipe-card {
-    background: var(--warm-white);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 1.25rem 1.5rem;
-    margin-bottom: 0.75rem;
-    cursor: pointer;
-    transition: border-color 0.15s, box-shadow 0.15s;
-  }
-
-  .recipe-card:hover {
-    border-color: var(--copper-light);
-    box-shadow: 0 2px 8px rgba(160,82,45,0.08);
-  }
-
-  .recipe-card-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 0.5rem;
-  }
-
-  .recipe-card-name {
-    font-family: 'DM Serif Display', serif;
-    font-size: 1.05rem;
-  }
-
-  .recipe-badge {
-    font-size: 11px;
-    padding: 2px 8px;
-    border-radius: 20px;
-    font-weight: 500;
-  }
-
-  .badge-builtin {
-    background: var(--copper-pale);
-    color: var(--copper);
-  }
-
-  .badge-custom {
-    background: var(--active-blue-bg);
-    color: var(--active-blue);
-  }
-
-  .recipe-card-meta {
-    font-size: 12px;
-    color: var(--ink-light);
-  }
-
-  .recipe-steps-preview {
-    display: flex;
-    gap: 4px;
-    margin-top: 0.75rem;
-    flex-wrap: wrap;
-  }
-
-  .step-chip {
-    background: var(--cream-dark);
-    border-radius: 6px;
-    padding: 3px 8px;
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    color: var(--ink-mid);
-  }
-
-  /* Recipe editor */
-  .recipe-editor {
-    background: var(--warm-white);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 1.5rem;
-    margin-top: 1.5rem;
-  }
-
-  .editor-title {
-    font-family: 'DM Serif Display', serif;
-    font-size: 1.2rem;
-    margin-bottom: 1.25rem;
-  }
-
-  .pour-steps-editor { margin-bottom: 1rem; }
-
-  .pour-step-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr auto;
-    gap: 0.5rem;
-    align-items: end;
-    margin-bottom: 0.5rem;
-  }
-
-  .pour-step-row input { font-size: 13px; padding: 0.5rem 0.65rem; }
-  .pour-step-row label { font-size: 11px; }
-
-  .remove-step {
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: var(--ink-light);
-    font-size: 18px;
-    line-height: 1;
-    padding: 6px;
-    border-radius: 6px;
-    transition: color 0.15s;
-    margin-bottom: 1px;
-  }
-
-  .remove-step:hover { color: var(--danger); }
-
-  /* ─── HISTORY VIEW ─── */
-  .history-item {
-    background: var(--warm-white);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 1.25rem 1.5rem;
-    margin-bottom: 0.75rem;
-  }
-
-  .history-header {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    margin-bottom: 0.5rem;
-  }
-
-  .history-recipe-name {
-    font-family: 'DM Serif Display', serif;
-    font-size: 1rem;
-  }
-
-  .history-date {
-    font-size: 11px;
-    color: var(--ink-light);
-    font-family: 'DM Mono', monospace;
-  }
-
-  .history-meta {
-    font-size: 13px;
-    color: var(--ink-mid);
-    margin-bottom: 0.5rem;
-  }
-
-  .history-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px;
-    margin-bottom: 0.5rem;
-  }
-
-  .history-tag {
-    background: var(--cream-dark);
-    border-radius: 20px;
-    padding: 2px 8px;
-    font-size: 11px;
-    color: var(--ink-mid);
-  }
-
-  .history-notes {
-    font-size: 13px;
-    color: var(--ink-light);
-    border-left: 2px solid var(--border);
-    padding-left: 0.75rem;
-    font-style: italic;
-    margin-top: 0.5rem;
-  }
-
-  .empty-state {
-    text-align: center;
-    padding: 3rem 1rem;
-    color: var(--ink-light);
-  }
-
-  .empty-state-icon {
-    font-size: 2.5rem;
-    margin-bottom: 1rem;
-    opacity: 0.4;
-  }
-
-  .empty-state p { font-size: 14px; }
-
-  /* Divider */
-  .divider {
-    border: none;
-    border-top: 1px solid var(--border);
-    margin: 1.25rem 0;
-  }
-
-  .section-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 1rem;
-  }
-
-  .section-title {
-    font-family: 'DM Serif Display', serif;
-    font-size: 1.1rem;
-  }
-
-  /* Ratio info */
-  .ratio-info {
-    background: var(--cream-dark);
-    border-radius: 8px;
-    padding: 0.75rem 1rem;
-    font-size: 12px;
-    color: var(--ink-mid);
-    margin-bottom: 1rem;
-    font-family: 'DM Mono', monospace;
-  }
-
-  .validation-warning {
-    background: #FFF8E7;
-    border: 1px solid rgba(160,115,0,0.2);
-    border-radius: 8px;
-    padding: 0.6rem 1rem;
-    font-size: 12px;
-    color: #7A5700;
-    margin-top: 0.5rem;
-    display: none;
-  }
-
-  .toast {
-    position: fixed;
-    bottom: 2rem;
-    left: 50%;
-    transform: translateX(-50%) translateY(80px);
-    background: var(--ink);
-    color: var(--warm-white);
-    padding: 0.7rem 1.25rem;
-    border-radius: 20px;
-    font-size: 13px;
-    font-weight: 500;
-    z-index: 100;
-    transition: transform 0.3s ease;
-    pointer-events: none;
-  }
-
-  .toast.show { transform: translateX(-50%) translateY(0); }
-
-  @media (max-width: 480px) {
-    .form-row { grid-template-columns: 1fr; }
-    .brew-inputs { grid-template-columns: 1fr 1fr; }
-    .pour-amount { font-size: 3rem; }
-    .pour-step-row { grid-template-columns: 1fr 1fr; }
-    .pour-step-row .col-name { grid-column: 1 / -1; }
-  }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Beantime — Pourover Timer</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>☕</text></svg>">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 <div class="app">
+
   <header>
     <div>
-      <div class="logo">Pour<span>over</span></div>
+      <div class="logo">Bean<span>time</span></div>
       <div class="header-subtitle">Precision brewing timer</div>
     </div>
   </header>
 
   <nav>
-    <button class="nav-btn active" onclick="switchView('brew')">Brew</button>
-    <button class="nav-btn" onclick="switchView('recipes')">Recipes</button>
-    <button class="nav-btn" onclick="switchView('history')">History</button>
+    <button class="nav-btn active" data-action="switch-view" data-view="brew">Brew</button>
+    <button class="nav-btn" data-action="switch-view" data-view="recipes">Recipes</button>
+    <button class="nav-btn" data-action="switch-view" data-view="history">History</button>
   </nav>
 
   <!-- ─── BREW VIEW ─── -->
@@ -768,20 +39,32 @@
 
       <div class="recipe-selector">
         <div style="flex:1">
-          <label>Recipe</label>
-          <select id="recipe-select" onchange="onRecipeChange()"></select>
+          <label for="recipe-select">Recipe</label>
+          <select id="recipe-select" data-action="recipe-change"></select>
         </div>
+      </div>
+
+      <div class="form-group">
+        <label for="bean-input">Beans</label>
+        <input
+          type="text"
+          id="bean-input"
+          list="beans-datalist"
+          placeholder="e.g. Ethiopia Yirgacheffe"
+          autocomplete="off"
+        >
+        <datalist id="beans-datalist"></datalist>
       </div>
 
       <div class="brew-inputs">
         <div class="big-input-wrap">
-          <label>Coffee</label>
-          <input type="number" id="coffee-grams" value="20" min="5" max="100" step="0.5" oninput="updateWater()">
+          <label for="coffee-grams">Coffee</label>
+          <input type="number" id="coffee-grams" value="20" min="5" max="100" step="0.5" data-action="update-water">
           <div class="big-input-unit">grams</div>
         </div>
         <div class="big-input-wrap">
-          <label>Total water</label>
-          <input type="number" id="water-grams" value="300" min="50" max="2000" step="1" oninput="onWaterChange()">
+          <label for="water-grams">Total water</label>
+          <input type="number" id="water-grams" value="300" min="50" max="2000" step="1" data-action="water-change">
           <div class="big-input-unit">grams</div>
         </div>
       </div>
@@ -794,8 +77,8 @@
 
       <div class="steps-list" id="preview-steps"></div>
 
-      <div style="margin-top: 1.25rem; display: flex; gap: 0.75rem;">
-        <button class="btn btn-primary btn-full" onclick="startBrew()" id="start-btn">Start brewing</button>
+      <div style="margin-top: 1.25rem;">
+        <button class="btn btn-primary btn-full" data-action="start-brew">Start brewing</button>
       </div>
     </div>
 
@@ -805,7 +88,7 @@
         <div class="step-label" id="step-label">Step 1 of 5</div>
         <div class="step-name" id="step-name">Bloom</div>
         <div class="pour-amount" id="pour-amount">60 <span>g</span></div>
-        <div style="font-size:13px; color:rgba(255,255,255,0.4); margin-top:0.25rem;" id="pour-this-step">+60g this pour</div>
+        <div class="pour-this-step" id="pour-this-step">+60g this pour</div>
         <div class="timer-clock" id="timer-clock">0:45</div>
         <div class="timer-status" id="timer-status">pouring</div>
       </div>
@@ -815,40 +98,29 @@
         <div class="steps-list" id="active-steps-list"></div>
       </div>
 
-      <div class="timer-controls" id="timer-controls">
-        <button class="btn btn-outline" onclick="prevStep()">← Back</button>
-        <button class="btn btn-primary" onclick="nextStep()" id="next-btn">Next step →</button>
+      <div class="timer-controls">
+        <button class="btn btn-outline" data-action="prev-step">← Back</button>
+        <button class="btn btn-primary" data-action="next-step" id="next-btn">Next step →</button>
       </div>
 
       <div class="timer-controls three">
-        <button class="btn btn-outline btn-sm" onclick="togglePause()" id="pause-btn">Pause</button>
-        <button class="btn btn-outline btn-sm" onclick="resetBrew()">Reset</button>
-        <button class="btn btn-danger btn-sm" onclick="stopBrew()">Stop</button>
+        <button class="btn btn-outline btn-sm" data-action="toggle-pause" id="pause-btn">Pause</button>
+        <button class="btn btn-outline btn-sm" data-action="reset-brew">Reset</button>
+        <button class="btn btn-danger btn-sm" data-action="stop-brew">Stop</button>
       </div>
 
-      <!-- Session note -->
-      <div class="card session-note-section" style="margin-top: 1rem;">
-        <div class="card-title" style="font-size: 0.95rem; margin-bottom: 0.75rem;">Session log</div>
-        <div class="form-group">
-          <label>Bean tags</label>
-          <div class="tag-input-wrap" id="tag-wrap" onclick="focusTagInput()">
-            <input class="tag-input" id="tag-input" placeholder="Add bean / origin..." onkeydown="handleTagInput(event)">
-          </div>
-          <div style="font-size: 11px; color: var(--ink-light); margin-top: 4px;">Press Enter or comma to add</div>
-        </div>
-        <div class="form-group" style="margin-bottom: 0;">
-          <label>Notes</label>
-          <textarea id="session-notes" placeholder="How did it taste? Grind size, water temp, bloom time..."></textarea>
-        </div>
-      </div>
     </div>
 
     <!-- Done state -->
     <div class="timer-done" id="timer-done">
       <h2>Enjoy your brew ☕</h2>
       <p id="done-summary" style="margin-bottom:1rem;"></p>
-      <button class="btn btn-primary" onclick="saveSession()">Save to history</button>
-      <button class="btn btn-outline" style="margin-left:0.5rem;" onclick="resetBrew()">Brew again</button>
+      <div class="form-group" style="text-align:left;">
+        <label for="session-notes">Notes</label>
+        <textarea id="session-notes" placeholder="How did it taste? Grind size, water temp, bloom time..."></textarea>
+      </div>
+      <button class="btn btn-primary" data-action="save-session">Save to history</button>
+      <button class="btn btn-outline" style="margin-left:0.5rem;" data-action="brew-again">Brew again</button>
     </div>
 
   </div>
@@ -858,7 +130,7 @@
 
     <div class="section-header">
       <div class="section-title">Recipes</div>
-      <button class="btn btn-primary btn-sm" onclick="showRecipeEditor()">+ New recipe</button>
+      <button class="btn btn-primary btn-sm" data-action="show-editor">+ New recipe</button>
     </div>
 
     <div id="recipes-list"></div>
@@ -869,17 +141,17 @@
 
       <div class="form-row">
         <div class="form-group" style="margin-bottom:0">
-          <label>Recipe name</label>
+          <label for="r-name">Recipe name</label>
           <input type="text" id="r-name" placeholder="e.g. My 4:6 bright">
         </div>
         <div class="form-group" style="margin-bottom:0">
-          <label>Water ratio (1:X)</label>
+          <label for="r-ratio">Water ratio (1:X)</label>
           <input type="number" id="r-ratio" value="15" min="10" max="20" step="0.5">
         </div>
       </div>
 
       <div class="form-group" style="margin-top: 1rem;">
-        <label>Description (optional)</label>
+        <label for="r-desc">Description (optional)</label>
         <input type="text" id="r-desc" placeholder="Balanced, sweet, good for washed light roasts">
       </div>
 
@@ -893,13 +165,13 @@
 
       <div id="steps-warning" class="validation-warning"></div>
 
-      <button class="btn btn-outline btn-sm" onclick="addEditorStep()" style="margin-bottom:1rem;">+ Add step</button>
+      <button class="btn btn-outline btn-sm" data-action="add-step" style="margin-bottom:1rem;">+ Add step</button>
 
       <hr class="divider">
 
       <div style="display:flex; gap: 0.75rem; justify-content: flex-end;">
-        <button class="btn btn-outline" onclick="cancelEditor()">Cancel</button>
-        <button class="btn btn-primary" onclick="saveRecipe()">Save recipe</button>
+        <button class="btn btn-outline" data-action="cancel-editor">Cancel</button>
+        <button class="btn btn-primary" data-action="save-recipe">Save recipe</button>
       </div>
     </div>
 
@@ -910,7 +182,7 @@
 
     <div class="section-header">
       <div class="section-title">Brew history</div>
-      <button class="btn btn-outline btn-sm btn-danger" onclick="clearHistory()" id="clear-history-btn">Clear all</button>
+      <button class="btn btn-outline btn-sm btn-danger" data-action="clear-history" id="clear-history-btn">Clear all</button>
     </div>
 
     <div id="history-list"></div>
@@ -921,660 +193,7 @@
 
 <div class="toast" id="toast"></div>
 
-<script>
-const DEFAULT_RECIPES = [
-  {
-    id: 'kasuya-46',
-    name: 'Tetsu Kasuya 4:6',
-    description: 'The classic 4:6 method — 40% water for flavor, 60% for strength',
-    ratio: 15,
-    builtin: true,
-    steps: [
-      { name: 'Bloom', pct: 0.133, pourSeconds: 15, waitSeconds: 30 },
-      { name: 'Second pour', pct: 0.133, pourSeconds: 15, waitSeconds: 30 },
-      { name: 'Third pour', pct: 0.2, pourSeconds: 20, waitSeconds: 35 },
-      { name: 'Fourth pour', pct: 0.2, pourSeconds: 20, waitSeconds: 35 },
-      { name: 'Final pour', pct: 0.2, pourSeconds: 20, waitSeconds: 40 }
-    ]
-  },
-  {
-    id: 'kasuya-sweet',
-    name: '4:6 Sweet Profile',
-    description: 'Adjusted 4:6 for sweeter extraction — first pour heavier',
-    ratio: 15,
-    builtin: true,
-    steps: [
-      { name: 'Bloom', pct: 0.2, pourSeconds: 15, waitSeconds: 35 },
-      { name: 'Second pour', pct: 0.067, pourSeconds: 15, waitSeconds: 30 },
-      { name: 'Third pour', pct: 0.2, pourSeconds: 20, waitSeconds: 35 },
-      { name: 'Fourth pour', pct: 0.2, pourSeconds: 20, waitSeconds: 35 },
-      { name: 'Final pour', pct: 0.2, pourSeconds: 20, waitSeconds: 40 }
-    ]
-  },
-  {
-    id: '3-pour',
-    name: '3-Pour Simple',
-    description: 'A simpler approach — bloom, two pours, great for beginners',
-    ratio: 15,
-    builtin: true,
-    steps: [
-      { name: 'Bloom', pct: 0.133, pourSeconds: 15, waitSeconds: 40 },
-      { name: 'Main pour', pct: 0.4, pourSeconds: 30, waitSeconds: 45 },
-      { name: 'Final pour', pct: 0.4, pourSeconds: 30, waitSeconds: 60 }
-    ]
-  }
-];
-
-function loadRecipes() {
-  const saved = JSON.parse(localStorage.getItem('pourover_recipes') || '[]');
-  return [...DEFAULT_RECIPES, ...saved];
-}
-
-function saveCustomRecipes(recipes) {
-  const custom = recipes.filter(r => !r.builtin);
-  localStorage.setItem('pourover_recipes', JSON.stringify(custom));
-}
-
-function loadHistory() {
-  return JSON.parse(localStorage.getItem('pourover_history') || '[]');
-}
-
-function saveHistory(h) {
-  localStorage.setItem('pourover_history', JSON.stringify(h));
-}
-
-let state = {
-  recipes: [],
-  currentRecipe: null,
-  coffeeGrams: 20,
-  waterGrams: 300,
-  computedSteps: [],
-  currentStep: 0,
-  phase: 'idle',
-  timerInterval: null,
-  phaseElapsed: 0,
-  paused: false,
-  sessionTags: [],
-  editingRecipeId: null
-};
-
-function init() {
-  state.recipes = loadRecipes();
-  renderRecipeSelect();
-  onRecipeChange();
-  renderRecipesView();
-  renderHistory();
-}
-
-function switchView(v) {
-  document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
-  document.getElementById('view-' + v).classList.add('active');
-  document.querySelectorAll('.nav-btn')[['brew','recipes','history'].indexOf(v)].classList.add('active');
-  if (v === 'recipes') renderRecipesView();
-  if (v === 'history') renderHistory();
-}
-
-function renderRecipeSelect() {
-  const sel = document.getElementById('recipe-select');
-  sel.innerHTML = state.recipes.map(r =>
-    `<option value="${r.id}">${r.name}</option>`
-  ).join('');
-  if (state.currentRecipe) sel.value = state.currentRecipe.id;
-}
-
-function onRecipeChange() {
-  const id = document.getElementById('recipe-select').value;
-  state.currentRecipe = state.recipes.find(r => r.id === id) || state.recipes[0];
-  const ratio = state.currentRecipe.ratio;
-  document.getElementById('coffee-grams').value = state.coffeeGrams;
-  document.getElementById('water-grams').value = Math.round(state.coffeeGrams * ratio);
-  state.waterGrams = Math.round(state.coffeeGrams * ratio);
-  updateWater();
-}
-
-function updateWater() {
-  state.coffeeGrams = parseFloat(document.getElementById('coffee-grams').value) || 20;
-  const ratio = state.currentRecipe.ratio;
-  state.waterGrams = Math.round(state.coffeeGrams * ratio);
-  document.getElementById('water-grams').value = state.waterGrams;
-  computeSteps();
-}
-
-function onWaterChange() {
-  state.waterGrams = parseInt(document.getElementById('water-grams').value) || 300;
-  computeSteps();
-}
-
-function computeSteps() {
-  const total = state.waterGrams;
-  const recipe = state.currentRecipe;
-  const steps = recipe.steps;
-  let computed = steps.map((s, i) => {
-    return {
-      name: s.name,
-      grams: Math.round(total * s.pct),
-      pourSeconds: s.pourSeconds,
-      waitSeconds: s.waitSeconds,
-      idx: i
-    };
-  });
-  const sum = computed.reduce((a, s) => a + s.grams, 0);
-  const diff = total - sum;
-  if (diff !== 0) computed[computed.length - 1].grams += diff;
-  let running = 0;
-  computed = computed.map(s => {
-    running += s.grams;
-    return { ...s, cumulativeGrams: running };
-  });
-  state.computedSteps = computed;
-  renderRatioInfo();
-  renderPreviewSteps();
-}
-
-function renderRatioInfo() {
-  const c = state.coffeeGrams, w = state.waterGrams;
-  const ratio = (w / c).toFixed(1);
-  const n = state.computedSteps.length;
-  document.getElementById('ratio-display').textContent =
-    `Ratio 1:${ratio} — ${n} pour${n !== 1 ? 's' : ''} — ${w}g total`;
-}
-
-function renderPreviewSteps() {
-  const el = document.getElementById('preview-steps');
-  el.innerHTML = state.computedSteps.map((s, i) => `
-    <div class="step-row">
-      <div class="step-row-num">${i + 1}</div>
-      <div class="step-row-name">${s.name}</div>
-      <div class="step-row-grams">+${s.grams}g → <strong>${s.cumulativeGrams}g</strong></div>
-      <div class="step-row-time">${s.pourSeconds}s pour / ${s.waitSeconds}s wait</div>
-    </div>
-  `).join('');
-}
-
-function startBrew() {
-  if (!state.computedSteps.length) return;
-  state.currentStep = 0;
-  state.phase = 'pour';
-  state.phaseElapsed = 0;
-  state.paused = false;
-  state.sessionTags = [];
-  document.getElementById('tag-wrap').querySelectorAll('.tag').forEach(t => t.remove());
-  document.getElementById('tag-input').value = '';
-  document.getElementById('session-notes').value = '';
-  document.getElementById('setup-panel').style.display = 'none';
-  document.getElementById('active-timer').style.display = 'block';
-  document.getElementById('timer-done').style.display = 'none';
-  buildStepsTrack();
-  renderActiveStepsList();
-  updateTimerDisplay();
-  startPhaseTimer();
-  requestWakeLock();
-}
-
-function buildStepsTrack() {
-  const track = document.getElementById('steps-track');
-  track.innerHTML = state.computedSteps.map((_, i) =>
-    `<div class="step-pip" id="pip-${i}"></div>`
-  ).join('');
-}
-
-function updatePips() {
-  state.computedSteps.forEach((_, i) => {
-    const pip = document.getElementById('pip-' + i);
-    if (!pip) return;
-    pip.className = 'step-pip' + (i < state.currentStep ? ' done' : i === state.currentStep ? ' active' : '');
-  });
-}
-
-function renderActiveStepsList() {
-  const el = document.getElementById('active-steps-list');
-  el.innerHTML = state.computedSteps.map((s, i) => {
-    const cls = i < state.currentStep ? 'step-row step-done' : i === state.currentStep ? 'step-row step-active' : 'step-row';
-    const icon = i < state.currentStep ? '<div class="checkmark"></div>' : `<div class="step-row-num">${i+1}</div>`;
-    return `<div class="${cls}" id="steprow-${i}">
-      ${icon}
-      <div class="step-row-name">${s.name}</div>
-      <div class="step-row-grams">${s.cumulativeGrams}g</div>
-      <div class="step-row-time">${s.pourSeconds}s / ${s.waitSeconds}s</div>
-    </div>`;
-  }).join('');
-}
-
-function updateTimerDisplay() {
-  const step = state.computedSteps[state.currentStep];
-  const total = state.computedSteps.length;
-  const isPour = state.phase === 'pour';
-  const phaseDur = isPour ? step.pourSeconds : step.waitSeconds;
-  const remaining = Math.max(0, phaseDur - state.phaseElapsed);
-  const mins = Math.floor(remaining / 60);
-  const secs = remaining % 60;
-
-  document.getElementById('step-label').textContent =
-    `Step ${state.currentStep + 1} of ${total}`;
-  document.getElementById('step-name').textContent = step.name;
-  document.getElementById('pour-amount').innerHTML = `${step.cumulativeGrams} <span>g</span>`;
-  document.getElementById('pour-this-step').textContent = `+${step.grams}g this pour`;
-  document.getElementById('timer-clock').textContent =
-    `${mins}:${secs.toString().padStart(2, '0')}`;
-  document.getElementById('timer-status').textContent = isPour ? 'pouring' : 'waiting / draw-down';
-
-  const disp = document.getElementById('timer-display');
-  const progress = Math.min(1, state.phaseElapsed / phaseDur);
-  if (isPour) {
-    disp.classList.add('pouring');
-    disp.style.setProperty('--progress', progress);
-  } else {
-    disp.classList.remove('pouring');
-    disp.style.setProperty('--progress', 0);
-  }
-
-  document.getElementById('next-btn').textContent =
-    state.currentStep === total - 1 && state.phase === 'wait' ? 'Finish brew' : 'Next step →';
-}
-
-function startPhaseTimer() {
-  clearInterval(state.timerInterval);
-  state.timerInterval = setInterval(() => {
-    if (state.paused) return;
-    state.phaseElapsed++;
-    updateTimerDisplay();
-    const step = state.computedSteps[state.currentStep];
-    const phaseDur = state.phase === 'pour' ? step.pourSeconds : step.waitSeconds;
-    if (state.phaseElapsed >= phaseDur) {
-      autoAdvance();
-    }
-  }, 1000);
-}
-
-function autoAdvance() {
-  if (state.phase === 'pour') {
-    state.phase = 'wait';
-    state.phaseElapsed = 0;
-    updateTimerDisplay();
-  } else {
-    if (state.currentStep < state.computedSteps.length - 1) {
-      state.currentStep++;
-      state.phase = 'pour';
-      state.phaseElapsed = 0;
-      renderActiveStepsList();
-      updatePips();
-      updateTimerDisplay();
-    } else {
-      finishBrew();
-    }
-  }
-}
-
-function nextStep() {
-  if (state.currentStep === state.computedSteps.length - 1 && state.phase === 'wait') {
-    finishBrew(); return;
-  }
-  if (state.phase === 'pour') {
-    state.phase = 'wait';
-    state.phaseElapsed = 0;
-  } else {
-    if (state.currentStep < state.computedSteps.length - 1) {
-      state.currentStep++;
-      state.phase = 'pour';
-      state.phaseElapsed = 0;
-      renderActiveStepsList();
-      updatePips();
-    }
-  }
-  updateTimerDisplay();
-}
-
-function prevStep() {
-  if (state.phase === 'wait') {
-    state.phase = 'pour';
-    state.phaseElapsed = 0;
-  } else if (state.currentStep > 0) {
-    state.currentStep--;
-    state.phase = 'wait';
-    state.phaseElapsed = 0;
-    renderActiveStepsList();
-    updatePips();
-  }
-  updateTimerDisplay();
-}
-
-function togglePause() {
-  state.paused = !state.paused;
-  document.getElementById('pause-btn').textContent = state.paused ? 'Resume' : 'Pause';
-}
-
-function stopBrew() {
-  if (!confirm('Stop brewing and return to setup?')) return;
-  resetBrew();
-}
-
-function resetBrew() {
-  clearInterval(state.timerInterval);
-  state.phase = 'idle';
-  state.paused = false;
-  document.getElementById('setup-panel').style.display = 'block';
-  document.getElementById('active-timer').style.display = 'none';
-  document.getElementById('timer-done').style.display = 'none';
-  document.getElementById('timer-display').classList.remove('pouring');
-  releaseWakeLock();
-}
-
-function finishBrew() {
-  clearInterval(state.timerInterval);
-  document.getElementById('active-timer').style.display = 'none';
-  document.getElementById('timer-done').style.display = 'block';
-  document.getElementById('done-summary').textContent =
-    `${state.currentRecipe.name} — ${state.waterGrams}g water, ${state.coffeeGrams}g coffee`;
-  releaseWakeLock();
-}
-
-function saveSession() {
-  const notes = document.getElementById('session-notes').value.trim();
-  const tags = [...state.sessionTags];
-  const history = loadHistory();
-  history.unshift({
-    id: Date.now(),
-    date: new Date().toISOString(),
-    recipeName: state.currentRecipe.name,
-    recipeId: state.currentRecipe.id,
-    coffeeGrams: state.coffeeGrams,
-    waterGrams: state.waterGrams,
-    tags,
-    notes
-  });
-  saveHistory(history);
-  showToast('Session saved!');
-  resetBrew();
-}
-
-// Tag input
-function handleTagInput(e) {
-  if (e.key === 'Enter' || e.key === ',') {
-    e.preventDefault();
-    const val = document.getElementById('tag-input').value.trim().replace(/,/g, '');
-    if (val) addTag(val);
-    document.getElementById('tag-input').value = '';
-  } else if (e.key === 'Backspace' && !document.getElementById('tag-input').value && state.sessionTags.length) {
-    removeTag(state.sessionTags.length - 1);
-  }
-}
-
-function addTag(val) {
-  if (state.sessionTags.includes(val)) return;
-  state.sessionTags.push(val);
-  const wrap = document.getElementById('tag-wrap');
-  const tagEl = document.createElement('div');
-  tagEl.className = 'tag';
-  tagEl.dataset.val = val;
-  tagEl.innerHTML = `${val} <span class="tag-remove" onclick="removeTagByVal('${val}')">×</span>`;
-  wrap.insertBefore(tagEl, document.getElementById('tag-input'));
-}
-
-function removeTagByVal(val) {
-  state.sessionTags = state.sessionTags.filter(t => t !== val);
-  document.querySelector(`.tag[data-val="${val}"]`)?.remove();
-}
-
-function removeTag(idx) {
-  removeTagByVal(state.sessionTags[idx]);
-}
-
-function focusTagInput() { document.getElementById('tag-input').focus(); }
-
-// ─── RECIPES VIEW ───
-
-function renderRecipesView() {
-  const recipes = state.recipes;
-  const el = document.getElementById('recipes-list');
-  el.innerHTML = recipes.map(r => {
-    const stepsHtml = r.steps.map(s =>
-      `<div class="step-chip">${Math.round(s.pct * 100)}% · ${s.pourSeconds}s</div>`
-    ).join('');
-    const badgeCls = r.builtin ? 'badge-builtin' : 'badge-custom';
-    const badgeTxt = r.builtin ? 'Built-in' : 'Custom';
-    const deleteBtn = r.builtin ? '' :
-      `<button class="btn btn-danger btn-sm" onclick="event.stopPropagation(); deleteRecipe('${r.id}')">Delete</button>`;
-    return `<div class="recipe-card" onclick="useRecipe('${r.id}')">
-      <div class="recipe-card-header">
-        <div class="recipe-card-name">${r.name}</div>
-        <div style="display:flex;gap:6px;align-items:center">
-          <span class="recipe-badge ${badgeCls}">${badgeTxt}</span>
-          ${deleteBtn}
-        </div>
-      </div>
-      <div class="recipe-card-meta">${r.description || ''} · 1:${r.ratio} ratio · ${r.steps.length} pours</div>
-      <div class="recipe-steps-preview">${stepsHtml}</div>
-    </div>`;
-  }).join('');
-}
-
-function useRecipe(id) {
-  document.getElementById('recipe-select').value = id;
-  state.currentRecipe = state.recipes.find(r => r.id === id);
-  switchView('brew');
-  onRecipeChange();
-}
-
-function showRecipeEditor(id) {
-  state.editingRecipeId = id || null;
-  const editor = document.getElementById('recipe-editor');
-  editor.style.display = 'block';
-  editor.scrollIntoView({ behavior: 'smooth' });
-
-  if (id) {
-    const r = state.recipes.find(x => x.id === id);
-    document.getElementById('editor-title').textContent = 'Edit recipe';
-    document.getElementById('r-name').value = r.name;
-    document.getElementById('r-ratio').value = r.ratio;
-    document.getElementById('r-desc').value = r.description || '';
-    renderEditorSteps(r.steps);
-  } else {
-    document.getElementById('editor-title').textContent = 'New recipe';
-    document.getElementById('r-name').value = '';
-    document.getElementById('r-ratio').value = 15;
-    document.getElementById('r-desc').value = '';
-    renderEditorSteps([
-      { name: 'Bloom', pct: 0.133, pourSeconds: 15, waitSeconds: 45 },
-      { name: 'Pour 2', pct: 0.133, pourSeconds: 15, waitSeconds: 35 },
-      { name: 'Pour 3', pct: 0.2, pourSeconds: 20, waitSeconds: 35 },
-      { name: 'Pour 4', pct: 0.2, pourSeconds: 20, waitSeconds: 35 },
-      { name: 'Final pour', pct: 0.267, pourSeconds: 20, waitSeconds: 40 }
-    ]);
-  }
-}
-
-function renderEditorSteps(steps) {
-  const el = document.getElementById('pour-steps-editor');
-  el.innerHTML = steps.map((s, i) => editorStepRow(s, i)).join('');
-}
-
-function editorStepRow(s, i) {
-  return `<div class="pour-step-row" id="erow-${i}">
-    <div class="col-name form-group" style="margin:0">
-      <label>Step name</label>
-      <input type="text" value="${s.name}" placeholder="Pour ${i+1}" oninput="validateEditor()">
-    </div>
-    <div class="form-group" style="margin:0">
-      <label>% of water</label>
-      <input type="number" value="${Math.round(s.pct * 1000) / 10}" min="1" max="100" step="0.5" oninput="validateEditor()">
-    </div>
-    <div class="form-group" style="margin:0">
-      <label>Pour (sec)</label>
-      <input type="number" value="${s.pourSeconds}" min="5" max="120" step="1">
-    </div>
-    <div class="form-group" style="margin:0">
-      <label>Wait (sec)</label>
-      <input type="number" value="${s.waitSeconds}" min="10" max="120" step="1">
-    </div>
-    <button class="remove-step" onclick="removeEditorStep(${i})" title="Remove step">×</button>
-  </div>`;
-}
-
-function addEditorStep() {
-  const el = document.getElementById('pour-steps-editor');
-  const rows = el.querySelectorAll('.pour-step-row');
-  const i = rows.length;
-  const div = document.createElement('div');
-  div.innerHTML = editorStepRow({ name: `Pour ${i+1}`, pct: 0.1, pourSeconds: 20, waitSeconds: 35 }, i);
-  el.appendChild(div.firstElementChild);
-  validateEditor();
-}
-
-function removeEditorStep(i) {
-  document.getElementById('erow-' + i)?.remove();
-  renumberEditorRows();
-  validateEditor();
-}
-
-function renumberEditorRows() {
-  const rows = document.querySelectorAll('#pour-steps-editor .pour-step-row');
-  rows.forEach((row, i) => { row.id = 'erow-' + i; });
-}
-
-function validateEditor() {
-  const rows = document.querySelectorAll('#pour-steps-editor .pour-step-row');
-  let total = 0;
-  rows.forEach(row => {
-    const inputs = row.querySelectorAll('input');
-    total += parseFloat(inputs[1]?.value || 0);
-  });
-  const warn = document.getElementById('steps-warning');
-  const diff = Math.abs(total - 100);
-  if (diff > 0.5) {
-    warn.style.display = 'block';
-    warn.textContent = `Pour percentages sum to ${total.toFixed(1)}% — they should total 100%. Difference: ${(total - 100).toFixed(1)}%`;
-  } else {
-    warn.style.display = 'none';
-  }
-}
-
-function cancelEditor() {
-  document.getElementById('recipe-editor').style.display = 'none';
-  state.editingRecipeId = null;
-}
-
-function saveRecipe() {
-  const name = document.getElementById('r-name').value.trim();
-  if (!name) { showToast('Please add a recipe name'); return; }
-  const ratio = parseFloat(document.getElementById('r-ratio').value) || 15;
-  const desc = document.getElementById('r-desc').value.trim();
-
-  const rows = document.querySelectorAll('#pour-steps-editor .pour-step-row');
-  const steps = [];
-  rows.forEach(row => {
-    const inputs = row.querySelectorAll('input');
-    steps.push({
-      name: inputs[0].value || 'Pour',
-      pct: parseFloat(inputs[1].value) / 100,
-      pourSeconds: parseInt(inputs[2].value) || 20,
-      waitSeconds: parseInt(inputs[3].value) || 35
-    });
-  });
-
-  if (!steps.length) { showToast('Add at least one step'); return; }
-
-  const id = state.editingRecipeId || ('custom-' + Date.now());
-  const recipe = { id, name, description: desc, ratio, builtin: false, steps };
-
-  state.recipes = state.recipes.filter(r => r.id !== id);
-  state.recipes.push(recipe);
-  saveCustomRecipes(state.recipes);
-
-  renderRecipeSelect();
-  renderRecipesView();
-  cancelEditor();
-  showToast('Recipe saved!');
-}
-
-function deleteRecipe(id) {
-  if (!confirm('Delete this recipe?')) return;
-  state.recipes = state.recipes.filter(r => r.id !== id);
-  saveCustomRecipes(state.recipes);
-  renderRecipeSelect();
-  renderRecipesView();
-  showToast('Recipe deleted');
-}
-
-// ─── HISTORY VIEW ───
-
-function renderHistory() {
-  const history = loadHistory();
-  const el = document.getElementById('history-list');
-  const clearBtn = document.getElementById('clear-history-btn');
-  if (!history.length) {
-    el.innerHTML = `<div class="empty-state">
-      <div class="empty-state-icon">☕</div>
-      <p>No brews logged yet.<br>Save a session after brewing to see it here.</p>
-    </div>`;
-    clearBtn.style.display = 'none';
-    return;
-  }
-  clearBtn.style.display = '';
-  el.innerHTML = history.map(h => {
-    const date = new Date(h.date);
-    const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-    const timeStr = date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
-    const tagsHtml = h.tags?.map(t => `<div class="history-tag">${t}</div>`).join('') || '';
-    const notesHtml = h.notes ? `<div class="history-notes">${h.notes}</div>` : '';
-    return `<div class="history-item">
-      <div class="history-header">
-        <div class="history-recipe-name">${h.recipeName}</div>
-        <div class="history-date">${dateStr} · ${timeStr}</div>
-      </div>
-      <div class="history-meta">${h.coffeeGrams}g coffee · ${h.waterGrams}g water</div>
-      ${tagsHtml ? `<div class="history-tags">${tagsHtml}</div>` : ''}
-      ${notesHtml}
-    </div>`;
-  }).join('');
-}
-
-function clearHistory() {
-  if (!confirm('Clear all brew history?')) return;
-  saveHistory([]);
-  renderHistory();
-  showToast('History cleared');
-}
-
-// Wake Lock API
-let wakeLock = null;
-async function requestWakeLock() {
-  try {
-    if ('wakeLock' in navigator) {
-      wakeLock = await navigator.wakeLock.request('screen');
-    }
-  } catch(e) {}
-}
-function releaseWakeLock() {
-  if (wakeLock) { wakeLock.release(); wakeLock = null; }
-}
-
-// Toast
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2500);
-}
-
-// PWA manifest injection
-const manifest = {
-  name: 'Pourover Timer',
-  short_name: 'Pour',
-  start_url: '/',
-  display: 'standalone',
-  background_color: '#F5F0E8',
-  theme_color: '#A0522D',
-  icons: [{ src: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">☕</text></svg>', sizes: '192x192', type: 'image/svg+xml' }]
-};
-const blob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
-const manifestUrl = URL.createObjectURL(blob);
-const manifestLink = document.createElement('link');
-manifestLink.rel = 'manifest';
-manifestLink.href = manifestUrl;
-document.head.appendChild(manifestLink);
-
-init();
-</script>
+<!-- App logic — loaded at end of body so DOM is ready -->
+<script src="app.js" defer></script>
 </body>
 </html>
