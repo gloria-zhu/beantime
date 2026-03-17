@@ -712,6 +712,71 @@ function renderHistory() {
     .join('');
 }
 
+function deleteHistoryEntry(id) {
+  const numericId = parseInt(id);
+  const wrap = el('hsw-' + numericId);
+  if (wrap) {
+    wrap.style.transition = 'opacity 0.2s, max-height 0.3s 0.15s';
+    wrap.style.opacity = '0';
+    wrap.style.maxHeight = '0';
+    wrap.style.overflow = 'hidden';
+    setTimeout(() => {
+      const history = loadHistory().filter((h) => h.id !== numericId);
+      saveHistory(history);
+      renderHistory();
+      showToast('Entry deleted');
+    }, 350);
+  }
+}
+
+function attachSwipeListeners() {
+  const SWIPE_THRESHOLD = 60;
+  const REVEAL_WIDTH = 80;
+
+  document.querySelectorAll('.history-swipe-wrap').forEach((wrap) => {
+    const card = wrap.querySelector('.history-item');
+    let startX = 0;
+    let currentX = 0;
+    let revealed = false;
+
+    function snapTo(x, animate = true) {
+      card.style.transition = animate ? 'transform 0.2s ease' : 'none';
+      card.style.transform = `translateX(${x}px)`;
+      revealed = x < 0;
+    }
+
+    card.addEventListener('touchstart', (e) => {
+      startX = e.touches[0].clientX;
+      currentX = revealed ? -REVEAL_WIDTH : 0;
+      card.style.transition = 'none';
+    }, { passive: true });
+
+    card.addEventListener('touchmove', (e) => {
+      const dx = e.touches[0].clientX - startX + currentX;
+      const clamped = Math.min(0, Math.max(-REVEAL_WIDTH, dx));
+      card.style.transform = `translateX(${clamped}px)`;
+    }, { passive: true });
+
+    card.addEventListener('touchend', (e) => {
+      const dx = e.changedTouches[0].clientX - startX + currentX;
+      if (dx < -SWIPE_THRESHOLD) {
+        snapTo(-REVEAL_WIDTH);
+      } else {
+        snapTo(0);
+      }
+    });
+  });
+
+  document.addEventListener('touchstart', (e) => {
+    if (!e.target.closest('.history-swipe-wrap')) {
+      document.querySelectorAll('.history-item').forEach((card) => {
+        card.style.transition = 'transform 0.2s ease';
+        card.style.transform = 'translateX(0)';
+      });
+    }
+  }, { passive: true });
+}
+
 function clearHistory() {
   if (!confirm('Clear all brew history?')) return;
   saveHistory([]);
@@ -794,6 +859,7 @@ document.addEventListener('click', (e) => {
     case 'cancel-editor': cancelEditor(); break;
     case 'save-recipe':   saveRecipe(); break;
     case 'add-step':      addEditorStep(); break;
+    case 'delete-history': e.stopPropagation(); deleteHistoryEntry(id); break;
     case 'clear-history': clearHistory(); break;
     case 'focus-tags':    el('tag-input').focus(); break;
     case 'brew-again':    resetBrew(); break;
